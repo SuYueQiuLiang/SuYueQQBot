@@ -1,0 +1,4 @@
+# 项目排除路径
+/MCBot/target/
+/out/
+/target/

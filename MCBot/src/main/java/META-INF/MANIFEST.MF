@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+org.suyue.MCBot.Main-Class:org.suyue.bot.org.suyue.MCBot.Main
+Class-Path: kotlin-stdlib-jdk8-1.4.30.jar kotlin-stdlib-1.4.30.jar opent
+ est4j-1.1.1.jar fastjson-1.2.76.jar ktor-http-jvm-1.5.1.jar kotlinx-cor
+ outines-io-0.1.16.jar kotlin-test-annotations-common-1.4.30.jar annotat
+ ions-19.0.0.jar kotlinx-serialization-protobuf-jvm-1.1.0.jar kotlinx-co
+ routines-io-jvm-0.1.16.jar okio-2.6.0.jar junit-platform-engine-1.4.2.j
+ ar mirai-core-api-jvm-2.6.4.jar ktor-http-cio-jvm-1.5.1.jar okhttp-4.6.
+ 0.jar kotlinx-serialization-json-jvm-1.1.0.jar atomicfu-0.14.1.jar kotl
+ inx-io-jvm-0.1.16.jar kotlin-gradle-plugin-api-1.4.30.jar bcprov-jdk15o
+ n-1.64.jar slf4j-api-1.7.30.jar kotlinx-serialization-core-jvm-1.1.0.ja
+ r ktor-io-jvm-1.5.1.jar kotlin-reflect-1.4.30.jar atomicfu-jvm-0.15.1.j
+ ar kotlin-stdlib-common-1.4.30.jar ktor-client-core-jvm-1.5.1.jar mirai
+ -core-utils-jvm-2.6.4.jar junit-jupiter-api-5.4.2.jar kotlin-test-junit
+ 5-1.4.30.jar kotlinx-coroutines-jdk8-1.4.2.jar kotlin-jvm-blocking-brid
+ ge-jvm-1.10.3.jar kotlin-test-common-1.4.30.jar kotlin-serialization-1.
+ 4.30.jar mirai-core-jvm-2.6.4.jar ktor-client-okhttp-1.5.1.jar kotlin-s
+ tdlib-jdk7-1.4.30.jar kotlin-test-1.4.30.jar ktor-utils-jvm-1.5.1.jar k
+ tor-network-jvm-1.5.1.jar kotlinx-io-0.1.16.jar kotlinx-coroutines-core
+ -1.4.2.jar apiguardian-api-1.0.0.jar atomicfu-common-0.14.1.jar junit-p
+ latform-commons-1.4.2.jar junit-jupiter-engine-5.4.2.jar kotlinx-corout
+ ines-core-jvm-1.4.2.jar
+
