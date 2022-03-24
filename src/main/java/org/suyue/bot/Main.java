@@ -1,17 +1,13 @@
 package org.suyue.bot;
 
-import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.MessageEvent;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException{
         System.out.println("开始读取配置文件");
+        Perms.loadPerms();
         if(!Config.loadConfig()){
             System.out.println("读取配置文件失败！");
             System.exit(0);

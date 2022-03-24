@@ -10,7 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Perms {
-    private static Map<Long,Target> perMap = new HashMap<>();
+    private static final Map<Long,Target> perMap = new HashMap<>();
+    public static boolean isAdministrator(Long userId) {
+        if(perMap.get(userId)==null)
+            return false;
+        return perMap.get(userId) == Target.administrator || perMap.get(userId) == Target.owner;
+    }
     public static void loadPerms() throws IOException {
         JSONArray jsonArray = JSON.parseArray(FileUtils.readFileToString("./perms.cfg"));
         for(int i = 0;i< jsonArray.size();i++){
@@ -21,10 +26,11 @@ public class Perms {
         return perMap;
     }
     public static Target getPerms(Long userId){
-        return perMap.get(userId)==null ? Target.user : perMap.get(userId);
+        return perMap.get(userId) == null ? Target.user : perMap.get(userId);
     }
     public static void removePerms(Long userId) throws IOException {
-        perMap.remove(userId);
+        if(perMap.get(userId)!=null)
+            perMap.remove(userId);
         savePerms();
     }
     public static void addPerms(Long userId,Target target) throws IOException {

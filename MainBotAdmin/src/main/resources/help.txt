@@ -1,0 +1,12 @@
+本插件是Bot的主权限管理插件，提供以下命令：
+Message listPerm &owner *NoAt /查询现有权限表
+Message addAdministrator userId &owner *NoAt /添加管理员权限
+Message addOwner userId &owner *NoAt /添加顶级权限
+Message removePerm userId &owner *NoAt /删除目标权限（无论对方权限等级）
+GroupMessage listPerm &owner *NoAt /查询现有权限表
+GroupMessage addAdministrator userId &owner *NoAt /添加管理员权限
+GroupMessage addAdministrator At &owner *NoAt /添加管理员权限（运用@符号）
+GroupMessage addOwner userId &owner *NoAt /添加顶级权限
+GroupMessage addOwner At &owner *NoAt /添加顶级权限（运用@符号）
+GroupMessage removePerm userId &owner *NoAt /删除目标权限（无论对方权限等级）
+GroupMessage removePerm At &owner *NoAt /删除目标权限（无论对方权限等级,运用@符号）

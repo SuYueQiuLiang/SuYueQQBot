@@ -5,8 +5,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.MessageEvent;
+import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.BotConfiguration;
 
 import java.io.File;
@@ -44,14 +46,55 @@ public class Config {
     }
     public static void eventRegister(Bot bot) {
         bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, (event) -> {
-            for(Map.Entry<String,SuYueBotMod> entry: LoadMods.mods.entrySet()){
-                entry.getValue().receiveGroupMessage(event.getGroup().getId(),event.getSender().getId(),event.getMessage());
+            MessageChain messageChain = event.getMessage();
+            String messageStr = messageChain.contentToString();
+            String[] split = messageStr.split(" ");
+            if(isMessageOnlyPlainText(messageChain)&&split[0].equals("help")){
+                if(split.length == 1)
+                    event.getGroup().sendMessage(new At(event.getSender().getId()).plus(getHelpStr()));
+                else if(LoadMods.modHelps.get(split[1])!=null)
+                    event.getGroup().sendMessage(new At(event.getSender().getId()).plus(LoadMods.modHelps.get(split[1])));
+            }else
+                for(Map.Entry<String,SuYueBotMod> entry: LoadMods.mods.entrySet()){
+                    entry.getValue().receiveGroupMessage(event);
+                }
+        });
+        bot.getEventChannel().subscribeAlways(MessageEvent.class,(event)-> {
+            for (Map.Entry<String, SuYueBotMod> entry : LoadMods.mods.entrySet()) {
+                entry.getValue().receiveMessage(event);
             }
         });
-        bot.getEventChannel().subscribeAlways(MessageEvent.class,(event)->{
-            for(Map.Entry<String,SuYueBotMod> entry: LoadMods.mods.entrySet()){
-                entry.getValue().receiveMessage(event.getSender().getId(),event.getMessage());
-            }
+        bot.getEventChannel().subscribeAlways(FriendMessageEvent.class,(event)->{
+            MessageChain messageChain = event.getMessage();
+            String messageStr = messageChain.contentToString();
+            String[] split = messageStr.split(" ");
+            if (isMessageOnlyPlainText(messageChain) && split[0].equals("help")) {
+                if (split.length == 1)
+                    event.getSender().sendMessage(getHelpStr());
+                else if (LoadMods.modHelps.get(split[1]) != null)
+                    event.getSender().sendMessage(LoadMods.modHelps.get(split[1]));
+            } else
+                for (Map.Entry<String, SuYueBotMod> entry : LoadMods.mods.entrySet()) {
+                    entry.getValue().receiveFriendMessage(event);
+                }
         });
+    }
+    private static boolean isMessageOnlyPlainText(MessageChain messageChain){
+        for(int i =1;i< messageChain.size();i++)
+            if(!(messageChain.get(i) instanceof PlainText))
+                return false;
+        return true;
+    }
+    private static String getHelpStr(){
+        try {
+            StringBuilder builder = new StringBuilder(FileUtils.readFileToString("./help.txt"));
+            builder.append("\n目前已经加载的Mod：");
+            for(Map.Entry<String,SuYueBotMod> entry : LoadMods.mods.entrySet())
+                builder.append(entry.getKey()).append(" ");
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "读取Help文件失败！";
+        }
     }
 }

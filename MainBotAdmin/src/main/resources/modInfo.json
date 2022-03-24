@@ -1,0 +1,4 @@
+{
+  "modName": "权限管理/插件管理模块",
+  "modInterface": "org.suyue.MainBotAdmin.Main"
+}

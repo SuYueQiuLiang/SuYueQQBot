@@ -1,0 +1,9 @@
+Hello！这里是最可爱的Bot桑
+Bot本体仅携带基本的Help命令，其他命令均通过各类Mod加载
+Help所展示的命令列表格式如下
+使用方式 命令 参数 &权限需求 *是否需要At机器人 /命令描述
+如Help命令格式如下：
+Message help modName &user *NoAt /从私聊获取Help
+GroupMessage help modName &user *NoAt /从群内获取Help
+如果需要获取Mod的Help文件，请在参数内携带Mod名称，如获取MainBotAdmin插件，使用
+help MainBotAdmin 命令
