@@ -1,0 +1,10 @@
+本插件是Bot的乐健跑步插件，允许进行刷取乐健跑步任务
+使用前请先私聊Bot设置乐健账号
+目前仅支持SWPU南充校区路径，允许用户定义定时任务，每次刷取会增加3KM记录，虽然乐健有每日上限公里，但是实际上可以通过多次上传数据突破上限，请用户酌情使用
+注：如果需要任务详情推送服务请添加机器人为好友，设置乐健不需要添加机器人为好友仅需要私聊，推送功能目前仅支持主要Bot的好友推送
+本插件提供命令：
+Message setLezz userId userPassword &user *NoAt /设置乐健用户
+Message setTask hour_of_day validMileage &user *NoAt /设置跑步任务 参数1为24小时制的设定时间 参数2为公里数，一般建议2左右，实际上会跑2km+一点有效数据
+Message runLezz validMileage &user *NoAt /跑一次 参数1为公里数，一般建议2左右，实际上会跑2km+一点有效数据
+Message getLezzSet &user *NoAt /获取目前设置
+GroupMessage runLezz validMileage &user *NoAt /跑一次 参数1为公里数，一般建议2左右，实际上会跑2km+一点有效数据

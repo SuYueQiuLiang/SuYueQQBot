@@ -5,9 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
-import net.mamoe.mirai.event.events.FriendMessageEvent;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.MessageEvent;
+import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.BotConfiguration;
 
@@ -19,6 +17,7 @@ import java.util.Map;
 public class Config {
     public static Map<String,Bot> bots = new HashMap<>();
     static String cache = "./mirai/";
+    public static Bot defaultBot;
     static BotConfiguration.MiraiProtocol miraiProtocol = BotConfiguration.MiraiProtocol.ANDROID_PHONE;
     public static Map<String,Bot> listBot(){
         return bots;
@@ -33,11 +32,13 @@ public class Config {
                 fileBasedDeviceInfo();
                 setProtocol(miraiProtocol);
             }};
-            Bot bot = BotFactory.INSTANCE.newBot(botJson.getJSONObject(i).getInteger("botUserName"), botJson.getJSONObject(i).getString("botPassword"),botConfiguration);
-            if(botJson.getJSONObject(i).getBoolean("autoLogin")){
+            Bot bot = BotFactory.INSTANCE.newBot(botJson.getJSONObject(i).getLong("botUserName"), botJson.getJSONObject(i).getString("botPassword"),botConfiguration);
+            if(botJson.getJSONObject(i).getBoolean("autoLogin")||botJson.getJSONObject(i).getBoolean("default")){
                 bot.login();
                 eventRegister(bot);
             }
+            if(botJson.getJSONObject(i).getBoolean("default"))
+                defaultBot = bot;
             bots.put(botJson.getJSONObject(i).getString("botName"),bot);
             System.out.println("成功载入Bot " + botJson.getJSONObject(i).getString("botName"));
         }
@@ -45,6 +46,10 @@ public class Config {
         return true;
     }
     public static void eventRegister(Bot bot) {
+        bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, NewFriendRequestEvent::accept);
+        bot.getEventChannel().subscribeAlways(FriendAddEvent.class,(event)->{
+            event.getFriend().sendMessage(getHelpStr());
+        });
         bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, (event) -> {
             MessageChain messageChain = event.getMessage();
             String messageStr = messageChain.contentToString();

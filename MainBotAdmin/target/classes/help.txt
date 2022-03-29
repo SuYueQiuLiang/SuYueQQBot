@@ -1,4 +1,4 @@
-本插件是Bot的主权限管理插件，提供以下命令：
+本插件是Bot的主权限管理插件，本插件提供以下命令：
 Message listPerm &owner *NoAt /查询现有权限表
 Message addAdministrator userId &owner *NoAt /添加管理员权限
 Message addOwner userId &owner *NoAt /添加顶级权限

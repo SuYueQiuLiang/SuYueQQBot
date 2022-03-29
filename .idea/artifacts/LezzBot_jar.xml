@@ -1,10 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="MyQQBot-Frame:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/MyQQBot_Frame_jar</output-path>
-    <root id="archive" name="MyQQBot-Frame.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
-      </element>
+  <artifact type="jar" name="LezzBot:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MyQQBot_Frame_jar/mods</output-path>
+    <root id="archive" name="LezzBot.jar">
+      <element id="module-output" name="LezzBot" />
       <element id="module-output" name="MyQQBot-Frame" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/ktor/ktor-client-core-jvm/1.6.5/ktor-client-core-jvm-1.6.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/squareup/okio/okio/2.8.0/okio-2.8.0.jar" path-in-jar="/" />
@@ -31,10 +29,10 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/logging/log4j/log4j-core/2.17.2/log4j-core-2.17.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-serialization-protobuf-jvm/1.2.2/kotlinx-serialization-protobuf-jvm-1.2.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-io/0.1.16/kotlinx-io-0.1.16.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-coroutines-jdk8/1.6.0/kotlinx-coroutines-jdk8-1.6.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.0/kotlin-stdlib-jdk7-1.6.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/mamoe/mirai-core-api-jvm/2.10.0/mirai-core-api-jvm-2.10.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-serialization-json-jvm/1.2.2/kotlinx-serialization-json-jvm-1.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/kotlinx-coroutines-jdk8/1.6.0/kotlinx-coroutines-jdk8-1.6.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlinx/atomicfu-jvm/0.17.0/atomicfu-jvm-0.17.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/ktor/ktor-utils-jvm/1.6.5/ktor-utils-jvm-1.6.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/me/him188/kotlin-jvm-blocking-bridge-runtime-jvm/2.0.0-160.3/kotlin-jvm-blocking-bridge-runtime-jvm-2.0.0-160.3.jar" path-in-jar="/" />

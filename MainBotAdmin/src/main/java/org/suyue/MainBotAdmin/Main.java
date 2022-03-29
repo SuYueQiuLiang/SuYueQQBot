@@ -24,7 +24,6 @@ public class Main implements SuYueBotMod {
     public void receiveMessage(MessageEvent messageEvent) {
 
     }
-
     @Override
     public void receiveFriendMessage(FriendMessageEvent friendMessageEvent) {
         long senderId = friendMessageEvent.getSender().getId();

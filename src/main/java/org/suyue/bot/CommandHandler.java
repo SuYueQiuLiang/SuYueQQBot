@@ -11,6 +11,7 @@ public class CommandHandler {
                     System.out.println("开始尝试登录Bot "+splitCommand[1]);
                     Thread.sleep(1000);
                     Config.bots.get(splitCommand[1]).login();
+                    Config.eventRegister(Config.bots.get(splitCommand[1]));
                 }else System.out.println("命令格式错误或无对应Bot对象");
                 break;
             case "reloadMod":

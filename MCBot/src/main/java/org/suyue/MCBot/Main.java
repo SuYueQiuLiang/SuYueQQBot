@@ -8,27 +8,19 @@ import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.MessageEvent;
 import net.mamoe.mirai.message.data.MessageChain;
+import org.suyue.bot.FileUtils;
+import org.suyue.bot.ModConfig;
 import org.suyue.bot.SuYueBotMod;
-
+import net.kronos.rkon.core.Rcon;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main implements SuYueBotMod {
+    Map<Long,Rcon> rconMap = new HashMap<>();
     public Main(){
 
-        File file = new File("/mods/MCBot.json");
-        if(!file.exists())
-            return;
-        try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            String line;
-            StringBuilder builder = new StringBuilder();
-            while ((line = bufferedReader.readLine())!=null)
-                builder.append(line);
-            JSONObject jsonObject = JSON.parseObject(builder.toString());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
     @Override
     public void receiveGroupMessage(GroupMessageEvent groupMessageEvent) {

@@ -24,6 +24,7 @@
         <module>MCBot</module>
         <module>LezzBot</module>
         <module>MainBotAdmin</module>
+        <module>HttpBot</module>
     </modules>
 
     <properties>

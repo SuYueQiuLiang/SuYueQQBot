@@ -10,6 +10,7 @@
         <module name="MCBot" />
         <module name="MainBotAdmin" />
         <module name="MyQQBot" />
+        <module name="HttpBot" />
       </profile>
     </annotationProcessing>
   </component>

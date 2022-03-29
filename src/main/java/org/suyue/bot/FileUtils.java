@@ -7,7 +7,7 @@ public class FileUtils {
     public static String readFileToString(String path) throws IOException {
         File file = new File(path);
         if(!file.exists())
-            return "文件不存在！";
+            return "";
         InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder str = new StringBuilder();
@@ -20,7 +20,15 @@ public class FileUtils {
     }
     public static void saveFileWithString(String str,String path) throws IOException {
         File file = new File(path);
-        if(!file.exists()&&file.getParentFile().mkdirs()&&file.createNewFile()){
+        if(!file.exists()){
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            bufferedWriter.write(str);
+            bufferedWriter.close();
+            writer.close();
+        }else if(file.exists()){
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             bufferedWriter.write(str);
