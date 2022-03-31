@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-org.suyue.MCBot.org.suyue.LezzBot.Main-Class:org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.Main
+org.suyue.MCBot.org.suyue.LezzBot.org.suyue.HttpBot.Main-Class:org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.org.suyue.HttpBot.Main
 Class-Path: kotlin-stdlib-jdk8-1.4.30.jar kotlin-stdlib-1.4.30.jar opent
  est4j-1.1.1.jar fastjson-1.2.76.jar ktor-http-jvm-1.5.1.jar kotlinx-cor
  outines-io-0.1.16.jar kotlin-test-annotations-common-1.4.30.jar annotat

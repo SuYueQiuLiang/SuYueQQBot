@@ -1,10 +1,13 @@
+package org.suyue.HttpBot;
+
 import net.mamoe.mirai.Bot;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.Timer;
 
-public class LezzTask {
+public class HttpTask {
     //时间间隔
     private static final long PERIOD_DAY = 24 * 60 * 60 * 1000;
     public MyTimeTask task;
@@ -12,20 +15,20 @@ public class LezzTask {
     public long userQQ;
     public int hourOfDay;
     private final Bot bot;
-    public String userId,userPassword;
-    public double validMileage;
-    public LezzTask(int hourOfDay, Bot bot, long userQQ, String userId, String userPassword, double validMileage) {
+    public String httpUrl,param,taskName;
+    public Map<String, String> headers;
+    public HttpTask(int hourOfDay, Bot bot, String taskName, long userQQ, String httpUrl, Map<String, String> headers, String param) {
         this.hourOfDay = hourOfDay;
         this.bot = bot;
+        this.taskName = taskName;
+        this.httpUrl = httpUrl;
+        this.headers = headers;
+        this.param = param;
         this.userQQ = userQQ;
-        this.userId = userId;
-        this.userPassword = userPassword;
-        this.validMileage = validMileage;
         if (hourOfDay != -1) {
             Calendar calendar = Calendar.getInstance();calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-
             Date date = calendar.getTime(); //第一次执行定时任务的时间
 
             //如果第一次执行定时任务的时间 小于 当前的时间
@@ -34,7 +37,7 @@ public class LezzTask {
                 date = this.addDay(date, 1);
             }
             timer = new Timer();
-            task = new MyTimeTask(bot, userQQ, userId, userPassword,validMileage);
+            task = new MyTimeTask(bot,taskName, userQQ, httpUrl, headers,param);
             //安排指定的任务在指定的时间开始进行重复的固定延迟执行。
             timer.schedule(task, date, PERIOD_DAY);
         }
@@ -55,7 +58,7 @@ public class LezzTask {
                 task.cancel();
             }
             timer = new Timer();
-            task = new MyTimeTask(bot, userQQ, userId, userPassword,validMileage);
+            task = new MyTimeTask(bot,taskName, userQQ, httpUrl, headers,param);
             timer.schedule(task, date, PERIOD_DAY);
         }else timer.cancel();
     }

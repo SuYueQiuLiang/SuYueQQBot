@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.Main-Class: org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.Main
+org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.org.suyue.HttpBot.Main-Class: org.suyue.bot.org.suyue.MCBot.org.suyue.LezzBot.org.suyue.HttpBot.Main
 Class-Path: opentest4j-1.1.1.jar annotations-19.0.0.jar atomicfu-jvm-0.1
  5.1.jar kotlinx-coroutines-core-1.4.2.jar kotlin-gradle-plugin-api-1.4.
  30.jar ktor-network-jvm-1.5.1.jar kotlin-test-common-1.4.30.jar junit-p

@@ -19,15 +19,15 @@ import java.util.Map;
 public class Main implements SuYueBotMod {
     private static final String modName = "LezzBot";
     private JSONArray config;
-    private Map<Long,LezzTask> users = new HashMap<>();
-    private ModConfig modConfig;
+    private final Map<Long,LezzTask> users = new HashMap<>();
+    private final ModConfig modConfig;
     public Main(){
         modConfig = new ModConfig(modName);
         config = JSON.parseArray(modConfig.readConfig());
         if(config == null)
             return;
         for(int i = 0;i<config.size();i++){
-            LezzTask lezzTask  = new LezzTask(config.getJSONObject(i).getInteger("scheduledTask"), Config.defaultBot,config.getJSONObject(i).getLong("userQQ"),config.getJSONObject(i).getString("userId"),config.getJSONObject(i).getString("userPassword"),config.getJSONObject(i).getDouble("validMileage"));;
+            LezzTask lezzTask  = new LezzTask(config.getJSONObject(i).getInteger("scheduledTask"), Config.defaultBot,config.getJSONObject(i).getLong("userQQ"),config.getJSONObject(i).getString("userId"),config.getJSONObject(i).getString("userPassword"),config.getJSONObject(i).getDouble("validMileage"));
             users.put(config.getJSONObject(i).getLong("userQQ"),lezzTask);
         }
     }
@@ -69,7 +69,7 @@ public class Main implements SuYueBotMod {
                     }
                 }
             }else event.getSender().sendMessage("携带非法资源");
-        }else if(messageStr.startsWith("setTask")){
+        }else if(messageStr.startsWith("setLezzTask")){
             if(isMessageOnlyPlainText(messageChain)){
                 String[] split = messageStr.split(" ");
                 if(split.length<3)

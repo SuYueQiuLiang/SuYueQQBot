@@ -1,14 +1,20 @@
+package org.suyue.HttpBot;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpUtil {
     private static final Map<String,String> cookies = new HashMap<>();
-    public String doGet(String urlString,String auth,String cookies, Map<String,String> headers) {
+    public static void main(String[] args){
+
+    }
+    public String doGet(String urlString, Map<String,String> headers) {
         HttpURLConnection connection = null;
         InputStream is = null;
         BufferedReader br = null;
@@ -29,14 +35,15 @@ public class HttpUtil {
                 // 封装输入流is，并指定字符集
                 br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 // 存放数据
-                StringBuffer sbf = new StringBuffer();
-                String temp = null;
+                StringBuilder sbf = new StringBuilder();
+                String temp;
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);
                     sbf.append("\r\n");
                 }
                 result = sbf.toString();
-            }else System.out.println("failed http code: "+ connection.getResponseCode());
+                result = unicodeToCn(result);
+            }else result = "failed http code: "+ connection.getResponseCode();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -55,13 +62,14 @@ public class HttpUtil {
                     e.printStackTrace();
                 }
             }
-            connection.disconnect();// 关闭远程连接
+            if(connection!=null)
+                connection.disconnect();// 关闭远程连接
         }
 
         return result;
     }
 
-    public String doPost(String httpUrl, String param ,Map<String,String> headers) {
+    public String doPost(String httpUrl, Map<String,String> headers, String param) {
 
         HttpURLConnection connection = null;
         InputStream is = null;
@@ -95,15 +103,16 @@ public class HttpUtil {
                 // 对输入流对象进行包装:charset根据工作项目组的要求来设置
                 br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
-                StringBuffer sbf = new StringBuffer();
-                String temp = null;
+                StringBuilder sbf = new StringBuilder();
+                String temp;
                 // 循环遍历一行一行读取数据
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);
                     sbf.append("\r\n");
                 }
                 result = sbf.toString();
-            } else System.out.println("failed http code: "+ connection.getResponseCode());
+                result = unicodeToCn(result);
+            } else result = "failed http code: "+ connection.getResponseCode();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -134,5 +143,22 @@ public class HttpUtil {
             connection.disconnect();
         }
         return result;
+    }
+    private static String unicodeToCn(String str) {
+        Pattern pattern = Pattern.compile("(\\\\u(\\w{4}))");
+        Matcher matcher = pattern.matcher(str);
+
+        // 迭代，将str中的所有unicode转换为正常字符
+        while (matcher.find()) {
+            String unicodeFull = matcher.group(1); // 匹配出的每个字的unicode，比如\u67e5
+            String unicodeNum = matcher.group(2); // 匹配出每个字的数字，比如\u67e5，会匹配出67e5
+
+            // 将匹配出的数字按照16进制转换为10进制，转换为char类型，就是对应的正常字符了
+            char singleChar = (char) Integer.parseInt(unicodeNum, 16);
+
+            // 替换原始字符串中的unicode码
+            str = str.replace(unicodeFull, singleChar + "");
+        }
+        return str;
     }
 }

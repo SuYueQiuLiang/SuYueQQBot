@@ -1,3 +1,6 @@
 本插件是一个定时Http请求插件，适合进行一些简单的自动化签到等服务
-Message listTask &administrator *NoAt /查询现有任务列表
-Message addGetTask taskName taskUrl taskCookies taskTime &administrator *NoAt /添加新任务
+Message listHttpTask &administrator *NoAt /查询现有任务列表
+Message setHttpTask taskName taskTime taskUrl taskHeaders &administrator *NoAt /编辑Get任务 要求创建者或者顶级权限
+Message setHttpTask taskName taskTime taskUrl taskHeaders param &administrator *NoAt /编辑Post任务(请使用headers指定正文格式) 要求创建者或者顶级权限
+Message removeHttpTask taskName &administrator *NoAt /删除对应任务 要求创建者或者顶级权限
+taskTime请使用0-23正整数,headers请提供JsonArray，JsonArray中仅含有JSONObject，每个JSONObject有两个个String值的"headerName"和"headerValue"参数
