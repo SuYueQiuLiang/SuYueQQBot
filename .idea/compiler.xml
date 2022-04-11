@@ -11,6 +11,7 @@
         <module name="MainBotAdmin" />
         <module name="MyQQBot" />
         <module name="HttpBot" />
+        <module name="FeiYan" />
       </profile>
     </annotationProcessing>
   </component>

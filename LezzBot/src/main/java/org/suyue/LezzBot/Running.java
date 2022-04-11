@@ -9,7 +9,6 @@ import java.io.IOException;
 
 public class Running {
     private static final String host = "https://cpes.legym.cn";
-    private static final int insideVersion = 3000055;
     public static void main(String[] args){
         run(new HttpUtil(),null, 1569938823L,"19828436143","Shuruiting200012",3d);
     }
@@ -57,7 +56,7 @@ public class Running {
                     friend.sendMessage("获取版本信息失败！无法确保安全，停止任务！");
                 return;
             }
-            if(jsonObject.getJSONObject("data").getInteger("version")!=insideVersion){
+            if(jsonObject.getJSONObject("data").getInteger("version")!=Main.insideVersion){
                 System.err.println("乐健已更新新版本："+jsonObject.getJSONObject("data").getInteger("version"));
                 Friend friend = bot.getFriend(userQQ);
                 if(friend!=null)
@@ -144,6 +143,70 @@ public class Running {
             Friend friend = bot.getFriend(userQQ);
             if(friend!=null)
                 friend.sendMessage("跑步失败！意料之外的错误！");
+        }
+    }
+    public static int updateInsideVersion(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("entrance","1");
+            jsonObject.put("password",userPassword);
+            jsonObject.put("userName",userId);
+            httpUtil.doGet(host + "/education/semester/getCurrent",null);
+            String info = httpUtil.doPost(host+"/authorization/user/manage/login", jsonObject.toJSONString(), null);
+            //对http进行分析，解析收到数据code是否为0
+            if(info == null){
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("LezzBot登录失败！请检查用户名密码！");
+                return 0;
+            }
+            jsonObject = JSONObject.parseObject(info);
+            if(jsonObject.getInteger("code")!=0){
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("LezzBot登录失败！请检查用户名密码！");
+                return 0;
+            }
+            //如果收到数据并且code为正常，解析包内数据并且写入userInfo
+            jsonObject = jsonObject.getJSONObject("data");
+            String token = jsonObject.getString("accessToken"),organizationUserNumber = jsonObject.getString("organizationUserNumber"),organizationName = jsonObject.getString("schoolName") + " " +jsonObject.getString("organizationName");
+            String realName = jsonObject.getString("realName");
+            JSONObject userInfo = new JSONObject();
+            userInfo.put("organizationUserNumber",organizationUserNumber);
+            userInfo.put("organizationName",organizationName);
+            userInfo.put("realName",realName);
+            info = httpUtil.doGet(host+"/authorization/mobileApp/getLastVersion?platform=2", token);
+            if(info == null){
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取版本信息失败！");
+                return 0;
+            }
+            jsonObject = JSONObject.parseObject(info);
+            if(jsonObject.getInteger("code")!=0){
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取版本信息失败！");
+                return 0;
+            }
+            if(jsonObject.getJSONObject("data").getInteger("version")!=Main.insideVersion){
+                Main.insideVersion = jsonObject.getJSONObject("data").getInteger("version");
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("新的版本号："+jsonObject.getJSONObject("data").getInteger("version"));
+                return jsonObject.getJSONObject("data").getInteger("version");
+            }else {
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("版本号未更新！");
+                return 0;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            Friend friend = bot.getFriend(userQQ);
+            if(friend!=null)
+                friend.sendMessage("跑步失败！意料之外的错误！");
+            return 0;
         }
     }
     private static void saveUserInfo(JSONObject userInfo,long userQQ,String userId,String userPassword){

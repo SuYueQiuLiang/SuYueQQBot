@@ -25,6 +25,7 @@
         <module>LezzBot</module>
         <module>MainBotAdmin</module>
         <module>HttpBot</module>
+        <module>FeiYan</module>
     </modules>
 
     <properties>

@@ -7,4 +7,5 @@ Message setLezz userId userPassword &user *NoAt /设置乐健用户
 Message setLezzTask hour_of_day validMileage &user *NoAt /设置跑步任务 参数1为24小时制的设定时间 参数2为公里数，一般建议2左右，实际上会跑2km+一点有效数据
 Message runLezz validMileage &user *NoAt /跑一次 参数1为公里数，一般建议2左右，实际上会跑2km+一点有效数据
 Message getLezzSet &user *NoAt /获取目前设置
+Message updateInsideVersion &owner *NoAt /升级内置版本
 GroupMessage runLezz validMileage &user *NoAt /跑一次 参数1为公里数，一般建议2左右，实际上会跑2km+一点有效数据

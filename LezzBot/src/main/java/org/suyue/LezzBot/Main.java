@@ -19,11 +19,14 @@ import java.util.Map;
 public class Main implements SuYueBotMod {
     private static final String modName = "LezzBot";
     private JSONArray config;
+    public static int insideVersion;
     private final Map<Long,LezzTask> users = new HashMap<>();
     private final ModConfig modConfig;
     public Main(){
         modConfig = new ModConfig(modName);
-        config = JSON.parseArray(modConfig.readConfig());
+        JSONObject jsonObject = JSON.parseObject(modConfig.readConfig());
+        insideVersion = jsonObject.getInteger("insideVersion");
+        config = jsonObject.getJSONArray("array");
         if(config == null)
             return;
         for(int i = 0;i<config.size();i++){
@@ -31,7 +34,7 @@ public class Main implements SuYueBotMod {
             users.put(config.getJSONObject(i).getLong("userQQ"),lezzTask);
         }
     }
-    private void saveConfig(){
+    public void saveConfig(){
         config = new JSONArray();
         for(Map.Entry<Long,LezzTask> userEntry : users.entrySet()){
             JSONObject object = new JSONObject();
@@ -42,16 +45,19 @@ public class Main implements SuYueBotMod {
             object.put("validMileage",userEntry.getValue().validMileage);
             config.add(object);
         }
-        modConfig.saveConfig(config.toString());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("array",config);
+        jsonObject.put("insideVersion",insideVersion);
+        modConfig.saveConfig(jsonObject.toJSONString());
     }
     @Override
     public void receiveFriendMessage(FriendMessageEvent event) {
         long senderId = event.getSender().getId();
         MessageChain messageChain = event.getMessage();
         String messageStr = messageChain.contentToString();
-        if(messageStr.startsWith("setLezz")){
+        String[] split = messageStr.split(" ");
+        if(messageStr.startsWith("setLezz")&&split[0].equals("setLezz")){
             if(isMessageOnlyPlainText(messageChain)){
-                String[] split = messageStr.split(" ");
                 if(split.length<3)
                     event.getSender().sendMessage("请求格式错误");
                 else {
@@ -69,9 +75,8 @@ public class Main implements SuYueBotMod {
                     }
                 }
             }else event.getSender().sendMessage("携带非法资源");
-        }else if(messageStr.startsWith("setLezzTask")){
+        }else if(messageStr.startsWith("setLezzTask")&&split[0].equals("setLezzTask")){
             if(isMessageOnlyPlainText(messageChain)){
-                String[] split = messageStr.split(" ");
                 if(split.length<3)
                     event.getSender().sendMessage("请求格式错误");
                 else {
@@ -92,14 +97,13 @@ public class Main implements SuYueBotMod {
             }else event.getSender().sendMessage("携带非法资源");
         }else if(messageStr.startsWith("runLezz")){
             if(isMessageOnlyPlainText(messageChain)){
-                String[] split = messageStr.split(" ");
                 if(split.length<2)
                     event.getSender().sendMessage("请求格式错误");
                 else {
                     if(users.get(event.getSender().getId())!=null){
                         try{
-                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
                             event.getSender().sendMessage("已发送请求，请稍后在私聊中查看推送");
+                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
                         }catch (NumberFormatException e){
                             e.printStackTrace();
                             event.getSender().sendMessage("参数格式错误，请输入数字");
@@ -111,6 +115,12 @@ public class Main implements SuYueBotMod {
         }else if(messageStr.startsWith("getLezzSet")){
             if(users.get(event.getSender().getId())!=null){
                 event.getSender().sendMessage("乐健用户名："+users.get(event.getSender().getId()).userId+"\n乐健密码："+users.get(event.getSender().getId()).userPassword+"\n设定的任务定时时间（-1为关闭定时任务）："+users.get(event.getSender().getId()).hourOfDay+"\n定时任务设定的目标里程："+users.get(event.getSender().getId()).validMileage);
+            }else event.getSender().sendMessage("你还没有绑定乐健账号");
+        }else if(messageStr.startsWith("updateInsideVersion")){
+            if(users.get(event.getSender().getId())!=null&&Perms.getPerms(event.getSender().getId()) == Target.owner){
+                int i = Running.updateInsideVersion(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword);
+                if(i!=0)
+                    saveConfig();
             }else event.getSender().sendMessage("你还没有绑定乐健账号");
         }
     }
@@ -126,8 +136,8 @@ public class Main implements SuYueBotMod {
                 else {
                     if(users.get(event.getSender().getId())!=null){
                         try{
-                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
                             event.getGroup().sendMessage(new At(event.getSender().getId()).plus("已发送请求，请稍后在私聊中查看推送，如果未推送并且需要推送，请添加机器人为好友"));
+                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
                         }catch (NumberFormatException e){
                             e.printStackTrace();
                             event.getGroup().sendMessage(new At(event.getSender().getId()).plus("参数格式错误，请输入整数"));
