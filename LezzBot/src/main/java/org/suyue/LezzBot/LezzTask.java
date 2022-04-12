@@ -59,7 +59,9 @@ public class LezzTask {
             timer = new Timer();
             task = new MyTimeTask(bot, userQQ, userId, userPassword,validMileage);
             timer.schedule(task, date, PERIOD_DAY);
-        }else timer.cancel();
+        }else if(timer!=null){
+            timer.cancel();
+        }
     }
     // 增加或减少天数
     public Date addDay(Date date, int num) {
