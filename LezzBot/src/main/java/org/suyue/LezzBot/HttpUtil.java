@@ -24,7 +24,6 @@ public class HttpUtil {
             if(auth!=null)
                 connection.setRequestProperty("Authorization", "Bearer " + auth);
             for(Map.Entry<String,String> entry : cookies.entrySet()){
-                System.out.println(entry.getValue());
                 connection.setRequestProperty("Cookie", entry.getValue());
             }
             // 设置读取远程返回的数据时间：60000毫秒
@@ -34,11 +33,9 @@ public class HttpUtil {
             connection.connect();
             for(String key : connection.getHeaderFields().keySet()) {
                 if (key != null && key.equals("Set-Cookie")) {
-                    System.out.println(Arrays.toString(connection.getHeaderFields().get(key).toArray()));
                     StringBuilder builder = new StringBuilder();
                     for (String str : connection.getHeaderFields().get(key))
                         builder.append(str).append(";");
-                    System.out.println(builder.toString());
                     cookies.put(key, builder.toString());
                 }
             }
@@ -47,8 +44,8 @@ public class HttpUtil {
                 // 封装输入流is，并指定字符集
                 br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 // 存放数据
-                StringBuffer sbf = new StringBuffer();
-                String temp = null;
+                StringBuilder sbf = new StringBuilder();
+                String temp;
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);
                     sbf.append("\r\n");
@@ -73,7 +70,9 @@ public class HttpUtil {
                     e.printStackTrace();
                 }
             }
-            connection.disconnect();// 关闭远程连接
+            if (connection != null) {
+                connection.disconnect();// 关闭远程连接
+            }
         }
 
         return result;
@@ -105,7 +104,6 @@ public class HttpUtil {
             if(auth!=null)
                 connection.setRequestProperty("Authorization", "Bearer " + auth);
             for(Map.Entry<String,String> entry : cookies.entrySet()){
-                System.out.println(entry.getValue());
                 connection.setRequestProperty("Cookie", entry.getValue());
             }
             connection.setRequestProperty("User-Agent","Mozilla/5.0 (iPhone; CPU iPhone OS 14_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1");
@@ -127,8 +125,8 @@ public class HttpUtil {
                 // 对输入流对象进行包装:charset根据工作项目组的要求来设置
                 br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
-                StringBuffer sbf = new StringBuffer();
-                String temp = null;
+                StringBuilder sbf = new StringBuilder();
+                String temp;
                 // 循环遍历一行一行读取数据
                 while ((temp = br.readLine()) != null) {
                     sbf.append(temp);

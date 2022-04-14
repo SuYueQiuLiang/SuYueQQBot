@@ -51,7 +51,7 @@ public class GenerateClass {
         content.put("limitationsGoalsSexInfoId", limitationsGoalsSexInfoId);
         content.put("systemVersion", "11.0.1");
         content.put("signPoint", new JSONArray());
-        content.put("routineLine", getRoutineLine());
+        content.put("routineLine", "routineLineInsertStringForReplace");
         int avePace = ((int)((date2.getTime()-date1.getTime())/1000/totMileage))*1000;
         content.put("avePace",avePace);
         content.put("totalPart", 1);
@@ -97,19 +97,5 @@ public class GenerateClass {
 //            "type": "自由跑",
 //            "uneffectiveReason": ""
 //    }
-    private static JSONArray getRoutineLine(){
-        JSONArray jsonArray = new JSONArray();
-        String[] pointNodes = pointNode.split(":");
-        JSONObject jsonObject;
-        for(int i = 0; i < pointNodes.length/2 ; i+=2){
-            jsonObject = new JSONObject();
-            //latitude小数点后5位开始随机
-            jsonObject.put("latitude",new Double(pointNodes[i]) + new Double(decimalFormat1.format((random.nextDouble()-0.5)/1000000)));
-            //longitude小数点后3位开始随机
-            jsonObject.put("longitude",new Double(pointNodes[i+1]) + new Double(decimalFormat2.format((random.nextDouble()-0.5)/10000)));
-            jsonArray.add(jsonObject);
-        }
-        return jsonArray;
-    }
 
 }

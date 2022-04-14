@@ -1,16 +1,23 @@
 package org.suyue.LezzBot;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Friend;
 import org.suyue.bot.FileUtils;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Running {
     private static final String host = "https://cpes.legym.cn";
+    private static final String baiduMapHost = "https://api.map.baidu.com";
     public static void main(String[] args){
-        run(new HttpUtil(),null, 1569938823L,"19828436143","Shuruiting200012",3d);
+        new Main();
+
     }
     public static void run(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword,double validMileage){
         try {
@@ -106,7 +113,7 @@ public class Running {
                 saveUserInfo(userInfo,userQQ,userId,userPassword);
                 Friend friend = bot.getFriend(userQQ);
                 if(friend!=null)
-                    friend.sendMessage("获取limitationsGoalsSexInfoId失败，结束流程");
+                    friend.sendMessage("获取limitationsGoalsSexInfoId/patternId失败，结束流程");
                 return;
             }
             jsonObject = JSONObject.parseObject(info);
@@ -114,11 +121,110 @@ public class Running {
                 saveUserInfo(userInfo,userQQ,userId,userPassword);
                 Friend friend = bot.getFriend(userQQ);
                 if(friend!=null)
-                    friend.sendMessage("获取limitationsGoalsSexInfoId失败，结束流程");
+                    friend.sendMessage("获取limitationsGoalsSexInfoId/patternId失败，结束流程");
                 return;
             }
             String limitationsGoalsSexInfoId = jsonObject.getJSONObject("data").getString("limitationsGoalsSexInfoId");
-            String endJsonReturn = httpUtil.doPost(host + "/running/app/uploadRunningDetails",GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage),token);
+            String patternId = jsonObject.getJSONObject("data").getString("patternId");
+            String runningInfo = GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage);
+            //{"latitude":"30.823632269965277","longitude":"106.12070583767361","limitationsGoalsSexInfoId":"402888da7c3a16bb017c3a172da40198","patternId":"8a9780da7c3634e0017c5405f20a0566","scoringType":1,"semesterId":"8a9780647ef79db8017f006a4e700047"}
+            DecimalFormat decimalFormat1 = new DecimalFormat("0.0000000000000000");
+            DecimalFormat decimalFormat2 = new DecimalFormat("0.000000000000000");
+            Random random = new Random();
+            jsonObject = new JSONObject();
+            jsonObject.put("latitude",28.82794867621528 + Double.parseDouble(decimalFormat1.format((random.nextDouble()-0.5)/1000000)));
+            jsonObject.put("longitude",105.11900607638889 + Double.parseDouble(decimalFormat2.format((random.nextDouble()-0.5)/10000)));
+            jsonObject.put("limitationsGoalsSexInfoId",limitationsGoalsSexInfoId);
+            jsonObject.put("patternId",patternId);
+            jsonObject.put("semesterId",semesterId);
+            jsonObject.put("scoringType",1);
+            String runningRange = httpUtil.doPost(host+"/running/app/getRunningRange",jsonObject.toJSONString(),token);
+            if(runningRange == null){
+                saveUserInfo(userInfo,userQQ,userId,userPassword);
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取跑步范围失败！");
+                return;
+            }
+            jsonObject = JSONObject.parseObject(runningRange);
+            if(jsonObject.getInteger("code")!=0){
+                saveUserInfo(userInfo,userQQ,userId,userPassword);
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取跑步范围失败！");
+                return;
+            }
+            ArrayList<Point> targetPoints;
+            jsonObject = jsonObject.getJSONObject("data");
+            JSONArray pointArray = jsonObject.getJSONArray("signRunningRegion").getJSONArray(0);
+            double maxLa=0,maxLo=0,minLa = 999,minLo = 999,randomLa,randomLo;
+            for(int i = 0;i<pointArray.size();i++)
+            {
+                if(pointArray.getJSONObject(i).getDouble("latitude")>maxLa)
+                    maxLa = pointArray.getJSONObject(i).getDouble("latitude");
+                if(pointArray.getJSONObject(i).getDouble("longitude")>maxLo)
+                    maxLo = pointArray.getJSONObject(i).getDouble("longitude");
+                if(pointArray.getJSONObject(i).getDouble("latitude")<minLa)
+                    minLa = pointArray.getJSONObject(i).getDouble("latitude");
+                if(pointArray.getJSONObject(i).getDouble("longitude")<minLo)
+                    minLo = pointArray.getJSONObject(i).getDouble("longitude");
+            }
+            randomLa = Double.parseDouble(decimalFormat1.format((minLa + maxLa) * random.nextDouble()));
+            randomLo = Double.parseDouble(decimalFormat2.format((minLo + maxLo) * random.nextDouble()));
+            jsonObject = new JSONObject();
+            jsonObject.put("latitude",randomLa);
+            jsonObject.put("longitude",randomLo);
+            jsonObject.put("limitationsGoalsSexInfoId",limitationsGoalsSexInfoId);
+            jsonObject.put("patternId",patternId);
+            jsonObject.put("semesterId",semesterId);
+            jsonObject.put("scoringType",1);
+            runningRange = httpUtil.doPost(host+"/running/app/getRunningRange",jsonObject.toJSONString(),token);
+            if(runningRange == null){
+                saveUserInfo(userInfo,userQQ,userId,userPassword);
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取跑步点位失败！");
+                return;
+            }
+            jsonObject = JSONObject.parseObject(runningRange);
+            if(jsonObject.getInteger("code")!=0){
+                saveUserInfo(userInfo,userQQ,userId,userPassword);
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("获取跑步点位失败！");
+                return;
+            }
+            targetPoints = new ArrayList<>();
+            jsonObject = jsonObject.getJSONObject("data");
+            pointArray = jsonObject.getJSONArray("signPoint");
+            for(int i = 0;i<pointArray.size();i++)
+                targetPoints.add(new Point(pointArray.getJSONObject(i).getDouble("latitude"),pointArray.getJSONObject(i).getDouble("longitude")));
+            JSONArray routineLine = new JSONArray();
+            for(int i = 0;i<targetPoints.size();i++){
+                double[] possint;
+                //https://api.map.baidu.com/directionlite/v1/walking?origin=40.01116,116.339303&destination=39.936404,116.452562&ak=jIzl1tWSKs5fhvBy4d25ydE1x8wxtjiP
+                String baiduMap;
+                if(i != targetPoints.size()-1)
+                    baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+targetPoints.get(i).latitude+","+targetPoints.get(i).longitude+"&destination="+targetPoints.get(i+1).latitude+","+targetPoints.get(i+1).longitude+"&ak="+Main.baiduMapAk,null);
+                else baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+targetPoints.get(i).latitude+","+targetPoints.get(i).longitude+"&destination="+targetPoints.get(0).latitude+","+targetPoints.get(0).longitude+"&ak="+Main.baiduMapAk,null);
+                JSONObject baiduRe = JSON.parseObject(baiduMap);
+                baiduRe = baiduRe.getJSONObject("result").getJSONArray("routes").getJSONObject(0);
+                JSONArray steps = baiduRe.getJSONArray("steps");
+                for(int ii = 0;ii< steps.size();ii++){
+                    String[] pathStr = steps.getJSONObject(ii).getString("path").split(";");
+                    for(String paths:pathStr){
+                        String[] pathPoint = paths.split(",");
+                        JSONObject object = new JSONObject();
+                        possint = bd2gcj(Double.parseDouble(pathPoint[1]),Double.parseDouble(pathPoint[0]));
+                        object.put("longitude",possint[1] + Double.parseDouble(decimalFormat1.format((random.nextDouble()-0.5)/1000000)));
+                        object.put("latitude",possint[0] + Double.parseDouble(decimalFormat2.format((random.nextDouble()-0.5)/10000)));
+                        routineLine.add(object);
+                    }
+                    //longitude小数点后3位开始随机
+                }
+            }
+            runningInfo = runningInfo.replace("\"routineLineInsertStringForReplace\"",routineLine.toJSONString());
+            String endJsonReturn = httpUtil.doPost(host + "/running/app/uploadRunningDetails",runningInfo,token);
             if(endJsonReturn == null){
                 saveUserInfo(userInfo,userQQ,userId,userPassword);
                 Friend friend = bot.getFriend(userQQ);
@@ -144,6 +250,39 @@ public class Running {
             if(friend!=null)
                 friend.sendMessage("跑步失败！意料之外的错误！");
         }
+    }
+    static double pi = 3.14159265358979324;
+    static double a = 6378245.0;
+    static double ee = 0.00669342162296594323;
+    public final static double x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+    public static double[] gcj2bd(double lat, double lon) {
+        double z = Math.sqrt(lon * lon + lat * lat) + 0.00002 * Math.sin(lat * x_pi);
+        double theta = Math.atan2(lat, lon) + 0.000003 * Math.cos(lon * x_pi);
+        double bd_lon = z * Math.cos(theta) + 0.0065;
+        double bd_lat = z * Math.sin(theta) + 0.006;
+        return new double[]{bd_lat, bd_lon};
+    }
+    public static double[] bd2gcj(double lat, double lon) {
+        double x = lon - 0.0065, y = lat - 0.006;
+        double z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi);
+        double theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi);
+        double gg_lon = z * Math.cos(theta);
+        double gg_lat = z * Math.sin(theta);
+        return new double[]{gg_lat, gg_lon};
+    }
+    private static double transformLon(double lat, double lon) {
+        double ret = 300.0 + lat + 2.0 * lon + 0.1 * lat * lat + 0.1 * lat * lon + 0.1 * Math.sqrt(Math.abs(lat));
+        ret += (20.0 * Math.sin(6.0 * lat * pi) + 20.0 * Math.sin(2.0 * lat * pi)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lat * pi) + 40.0 * Math.sin(lat / 3.0 * pi)) * 2.0 / 3.0;
+        ret += (150.0 * Math.sin(lat / 12.0 * pi) + 300.0 * Math.sin(lat / 30.0 * pi)) * 2.0 / 3.0;
+        return ret;
+    }
+    private static double transformLat(double lat, double lon) {
+        double ret = -100.0 + 2.0 * lat + 3.0 * lon + 0.2 * lon * lon + 0.1 * lat * lon + 0.2 * Math.sqrt(Math.abs(lat));
+        ret += (20.0 * Math.sin(6.0 * lat * pi) + 20.0 * Math.sin(2.0 * lat * pi)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lon * pi) + 40.0 * Math.sin(lon / 3.0 * pi)) * 2.0 / 3.0;
+        ret += (160.0 * Math.sin(lon / 12.0 * pi) + 320 * Math.sin(lon * pi / 30.0)) * 2.0 / 3.0;
+        return ret;
     }
     public static int updateInsideVersion(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword){
         try {
@@ -171,10 +310,6 @@ public class Running {
             jsonObject = jsonObject.getJSONObject("data");
             String token = jsonObject.getString("accessToken"),organizationUserNumber = jsonObject.getString("organizationUserNumber"),organizationName = jsonObject.getString("schoolName") + " " +jsonObject.getString("organizationName");
             String realName = jsonObject.getString("realName");
-            JSONObject userInfo = new JSONObject();
-            userInfo.put("organizationUserNumber",organizationUserNumber);
-            userInfo.put("organizationName",organizationName);
-            userInfo.put("realName",realName);
             info = httpUtil.doGet(host+"/authorization/mobileApp/getLastVersion?platform=2", token);
             if(info == null){
                 Friend friend = bot.getFriend(userQQ);

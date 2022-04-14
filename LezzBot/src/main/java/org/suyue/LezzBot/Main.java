@@ -20,12 +20,14 @@ public class Main implements SuYueBotMod {
     private static final String modName = "LezzBot";
     private JSONArray config;
     public static int insideVersion;
+    public static String baiduMapAk;
     private final Map<Long,LezzTask> users = new HashMap<>();
     private final ModConfig modConfig;
     public Main(){
         modConfig = new ModConfig(modName);
         JSONObject jsonObject = JSON.parseObject(modConfig.readConfig());
         insideVersion = jsonObject.getInteger("insideVersion");
+        baiduMapAk = jsonObject.getString("baiduMapAk");
         config = jsonObject.getJSONArray("array");
         if(config == null)
             return;
@@ -47,6 +49,7 @@ public class Main implements SuYueBotMod {
         }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("array",config);
+        jsonObject.put("baiduMapAk",baiduMapAk);
         jsonObject.put("insideVersion",insideVersion);
         modConfig.saveConfig(jsonObject.toJSONString());
     }
