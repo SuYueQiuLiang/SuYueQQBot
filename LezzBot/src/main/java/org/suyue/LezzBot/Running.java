@@ -17,7 +17,6 @@ public class Running {
     private static final String baiduMapHost = "https://api.map.baidu.com";
     public static void main(String[] args){
         new Main();
-
     }
     public static void run(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword,double validMileage){
         try {
@@ -70,6 +69,7 @@ public class Running {
                     friend.sendMessage("乐健更新新版本！无法确保安全，停止任务！");
                 return;
             }
+            String versionLabel = jsonObject.getJSONObject("data").getString("versionLabel");
             //请求用户具体数据，并且解析其中的总共已通过里程
             info = httpUtil.doGet(host+"/running/app/getHistoryDetails",token);
             //对http进行分析，解析收到数据code是否为0，如果不正常，此处可以返回登陆时已经获取到的数据
@@ -126,7 +126,6 @@ public class Running {
             }
             String limitationsGoalsSexInfoId = jsonObject.getJSONObject("data").getString("limitationsGoalsSexInfoId");
             String patternId = jsonObject.getJSONObject("data").getString("patternId");
-            String runningInfo = GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage);
             //{"latitude":"30.823632269965277","longitude":"106.12070583767361","limitationsGoalsSexInfoId":"402888da7c3a16bb017c3a172da40198","patternId":"8a9780da7c3634e0017c5405f20a0566","scoringType":1,"semesterId":"8a9780647ef79db8017f006a4e700047"}
             DecimalFormat decimalFormat1 = new DecimalFormat("0.0000000000000000");
             DecimalFormat decimalFormat2 = new DecimalFormat("0.000000000000000");
@@ -169,8 +168,8 @@ public class Running {
                 if(pointArray.getJSONObject(i).getDouble("longitude")<minLo)
                     minLo = pointArray.getJSONObject(i).getDouble("longitude");
             }
-            randomLa = Double.parseDouble(decimalFormat1.format((minLa + maxLa) * random.nextDouble()));
-            randomLo = Double.parseDouble(decimalFormat2.format((minLo + maxLo) * random.nextDouble()));
+            randomLa = Double.parseDouble(decimalFormat1.format(minLa + ((maxLa-minLa)*random.nextDouble())));
+            randomLo = Double.parseDouble(decimalFormat2.format(minLo + ((maxLo-minLo)*random.nextDouble())));
             jsonObject = new JSONObject();
             jsonObject.put("latitude",randomLa);
             jsonObject.put("longitude",randomLo);
@@ -179,6 +178,7 @@ public class Running {
             jsonObject.put("semesterId",semesterId);
             jsonObject.put("scoringType",1);
             runningRange = httpUtil.doPost(host+"/running/app/getRunningRange",jsonObject.toJSONString(),token);
+            JSONArray signPoints = new JSONArray();
             if(runningRange == null){
                 saveUserInfo(userInfo,userQQ,userId,userPassword);
                 Friend friend = bot.getFriend(userQQ);
@@ -197,16 +197,29 @@ public class Running {
             targetPoints = new ArrayList<>();
             jsonObject = jsonObject.getJSONObject("data");
             pointArray = jsonObject.getJSONArray("signPoint");
-            for(int i = 0;i<pointArray.size();i++)
+            for(int i = 0;i<pointArray.size();i++){
+                JSONObject signPointsObject = new JSONObject();
+                signPointsObject.put("state",1);
+                signPointsObject.put("signPoint",pointArray.getJSONObject(i).getString("id"));
+                signPoints.add(signPointsObject);
                 targetPoints.add(new Point(pointArray.getJSONObject(i).getDouble("latitude"),pointArray.getJSONObject(i).getDouble("longitude")));
+            }
             JSONArray routineLine = new JSONArray();
+            if(Main.baiduMapAk==null||Main.baiduMapAk.equals("")){
+                saveUserInfo(userInfo,userQQ,userId,userPassword);
+                Friend friend = bot.getFriend(userQQ);
+                if(friend!=null)
+                    friend.sendMessage("百度地图Ak配置有误，请联系管理员检查");
+                return;
+            }
             for(int i = 0;i<targetPoints.size();i++){
                 double[] possint;
                 //https://api.map.baidu.com/directionlite/v1/walking?origin=40.01116,116.339303&destination=39.936404,116.452562&ak=jIzl1tWSKs5fhvBy4d25ydE1x8wxtjiP
                 String baiduMap;
-                if(i != targetPoints.size()-1)
-                    baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+targetPoints.get(i).latitude+","+targetPoints.get(i).longitude+"&destination="+targetPoints.get(i+1).latitude+","+targetPoints.get(i+1).longitude+"&ak="+Main.baiduMapAk,null);
-                else baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+targetPoints.get(i).latitude+","+targetPoints.get(i).longitude+"&destination="+targetPoints.get(0).latitude+","+targetPoints.get(0).longitude+"&ak="+Main.baiduMapAk,null);
+                DecimalFormat decimalFormat3 = new DecimalFormat("0.000000");
+                if(i == 0)
+                    baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+decimalFormat3.format(randomLa)+","+decimalFormat3.format(randomLo)+"&destination="+targetPoints.get(0).latitude+","+targetPoints.get(0).longitude+"&ak="+Main.baiduMapAk,null);
+                else baiduMap = httpUtil.doGet(baiduMapHost+"/directionlite/v1/walking?coord_type=gcj02&origin="+targetPoints.get(i-1).latitude+","+targetPoints.get(i-1).longitude+"&destination="+targetPoints.get(i).latitude+","+targetPoints.get(i).longitude+"&ak="+Main.baiduMapAk,null);
                 JSONObject baiduRe = JSON.parseObject(baiduMap);
                 baiduRe = baiduRe.getJSONObject("result").getJSONArray("routes").getJSONObject(0);
                 JSONArray steps = baiduRe.getJSONArray("steps");
@@ -216,14 +229,14 @@ public class Running {
                         String[] pathPoint = paths.split(",");
                         JSONObject object = new JSONObject();
                         possint = bd2gcj(Double.parseDouble(pathPoint[1]),Double.parseDouble(pathPoint[0]));
-                        object.put("longitude",possint[1] + Double.parseDouble(decimalFormat1.format((random.nextDouble()-0.5)/1000000)));
-                        object.put("latitude",possint[0] + Double.parseDouble(decimalFormat2.format((random.nextDouble()-0.5)/10000)));
+                        object.put("longitude",possint[1] + Double.parseDouble(decimalFormat1.format((random.nextDouble()-0.5)/500000)));
+                        object.put("latitude",possint[0] + Double.parseDouble(decimalFormat2.format((random.nextDouble()-0.5)/5000)));
                         routineLine.add(object);
                     }
                     //longitude小数点后3位开始随机
                 }
             }
-            runningInfo = runningInfo.replace("\"routineLineInsertStringForReplace\"",routineLine.toJSONString());
+            String runningInfo = GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage,versionLabel,routineLine.toJSONString(),signPoints.toJSONString());
             String endJsonReturn = httpUtil.doPost(host + "/running/app/uploadRunningDetails",runningInfo,token);
             if(endJsonReturn == null){
                 saveUserInfo(userInfo,userQQ,userId,userPassword);
@@ -269,20 +282,6 @@ public class Running {
         double gg_lon = z * Math.cos(theta);
         double gg_lat = z * Math.sin(theta);
         return new double[]{gg_lat, gg_lon};
-    }
-    private static double transformLon(double lat, double lon) {
-        double ret = 300.0 + lat + 2.0 * lon + 0.1 * lat * lat + 0.1 * lat * lon + 0.1 * Math.sqrt(Math.abs(lat));
-        ret += (20.0 * Math.sin(6.0 * lat * pi) + 20.0 * Math.sin(2.0 * lat * pi)) * 2.0 / 3.0;
-        ret += (20.0 * Math.sin(lat * pi) + 40.0 * Math.sin(lat / 3.0 * pi)) * 2.0 / 3.0;
-        ret += (150.0 * Math.sin(lat / 12.0 * pi) + 300.0 * Math.sin(lat / 30.0 * pi)) * 2.0 / 3.0;
-        return ret;
-    }
-    private static double transformLat(double lat, double lon) {
-        double ret = -100.0 + 2.0 * lat + 3.0 * lon + 0.2 * lon * lon + 0.1 * lat * lon + 0.2 * Math.sqrt(Math.abs(lat));
-        ret += (20.0 * Math.sin(6.0 * lat * pi) + 20.0 * Math.sin(2.0 * lat * pi)) * 2.0 / 3.0;
-        ret += (20.0 * Math.sin(lon * pi) + 40.0 * Math.sin(lon / 3.0 * pi)) * 2.0 / 3.0;
-        ret += (160.0 * Math.sin(lon / 12.0 * pi) + 320 * Math.sin(lon * pi / 30.0)) * 2.0 / 3.0;
-        return ret;
     }
     public static int updateInsideVersion(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword){
         try {

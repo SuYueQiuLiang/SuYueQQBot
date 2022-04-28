@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-org.suyue.HttpBot.org.suyue.FeiYanBot.Main-Class: org.suyue.bot.org.suyue.HttpBot.org.suyue.FeiYanBot.Main
+Main-Class: org.suyue.bot.Main
 

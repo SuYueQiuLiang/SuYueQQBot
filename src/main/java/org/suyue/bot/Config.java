@@ -47,9 +47,6 @@ public class Config {
     }
     public static void eventRegister(Bot bot) {
         bot.getEventChannel().subscribeAlways(NewFriendRequestEvent.class, NewFriendRequestEvent::accept);
-        bot.getEventChannel().subscribeAlways(FriendAddEvent.class,(event)->{
-            event.getFriend().sendMessage(getHelpStr());
-        });
         bot.getEventChannel().subscribeAlways(GroupMessageEvent.class, (event) -> {
             MessageChain messageChain = event.getMessage();
             String messageStr = messageChain.contentToString();
