@@ -1,4 +1,4 @@
-package org.suyue.HttpBot;
+package org.suyue.YunShi;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HttpUtil {
-    private static final Map<String,String> cookies = new HashMap<>();
     public String doGet(String urlString, Map<String,String> headers) {
         HttpURLConnection connection = null;
         InputStream is = null;

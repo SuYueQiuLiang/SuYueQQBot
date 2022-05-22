@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="YunShi" />
+        <module name="MainBotAdmin" />
+        <module name="HttpBot" />
         <module name="LezzBot" />
         <module name="MCBot" />
-        <module name="MainBotAdmin" />
         <module name="MyQQBot" />
-        <module name="HttpBot" />
         <module name="FeiYan" />
       </profile>
     </annotationProcessing>

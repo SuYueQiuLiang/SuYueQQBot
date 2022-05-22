@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public class CommandHandler {
     public static void handleCommand(String command) throws InterruptedException, IOException {
         String[] splitCommand = command.split(" ");
+        for(String s:splitCommand)
+            System.out.println(s+" ");
         switch(splitCommand[0]){
             case "login":
                 if(splitCommand.length>=2&&(Config.bots.get(splitCommand[1])!=null)){
@@ -18,19 +20,18 @@ public class CommandHandler {
                     Config.eventRegister(Config.bots.get(splitCommand[1]));
                 }else System.out.println("命令格式错误或无对应Bot对象");
                 break;
-            case "reloadMod":
-                LoadMods.loadMods("./mods/");
+            case "reloadMods":
+                LoadMods.reloadMods("./mods/");
                 break;
             case "loadMod":
                 if(splitCommand.length>=2){
                     LoadMods.loadNewMod("./mods/",splitCommand[1]);
                 }else System.out.println("命令格式错误");
                 break;
-            case "say":
-                ContactList<Friend> friends = Config.defaultBot.getFriends();
-                for(Friend friend:friends){
-                    friend.sendMessage(splitCommand[1]);
-                }
+            case "unloadMod":
+                if(splitCommand.length>=2){
+                    LoadMods.unloadMod(splitCommand[1]);
+                }else System.out.println("命令格式错误");
                 break;
         }
     }

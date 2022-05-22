@@ -17,9 +17,14 @@ public class Running {
     private static final String baiduMapHost = "https://api.map.baidu.com";
     public static void main(String[] args){
         new Main();
+        System.out.println(System.currentTimeMillis());
+        run(new HttpUtil(),null,0,"18181445548","!LJSB1234",2, 63072000000L);
     }
-    public static void run(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword,double validMileage){
+    public static void run(HttpUtil httpUtil,Bot bot, long userQQ, String userId, String userPassword,double validMileage,long lackTime){
+
+
         try {
+
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("entrance","1");
             jsonObject.put("password",userPassword);
@@ -236,7 +241,8 @@ public class Running {
                     //longitude小数点后3位开始随机
                 }
             }
-            String runningInfo = GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage,versionLabel,routineLine.toJSONString(),signPoints.toJSONString());
+            String runningInfo = GenerateClass.getRunningDetail(semesterId,limitationsGoalsSexInfoId,validMileage,versionLabel,routineLine.toJSONString(),signPoints.toJSONString(),lackTime);
+
             String endJsonReturn = httpUtil.doPost(host + "/running/app/uploadRunningDetails",runningInfo,token);
             if(endJsonReturn == null){
                 saveUserInfo(userInfo,userQQ,userId,userPassword);

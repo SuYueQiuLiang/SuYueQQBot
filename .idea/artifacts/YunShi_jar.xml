@@ -1,10 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="MyQQBot-Frame:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/MyQQBot_Frame_jar</output-path>
-    <root id="archive" name="MyQQBot-Frame.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
-      </element>
+  <artifact type="jar" name="YunShi:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MyQQBot_Frame_jar/mods</output-path>
+    <root id="archive" name="YunShi.jar">
+      <element id="module-output" name="YunShi" />
       <element id="module-output" name="MyQQBot-Frame" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/mamoe/mirai-core-jvm/2.10.0/mirai-core-jvm-2.10.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.0/kotlin-stdlib-jdk8-1.6.0.jar" path-in-jar="/" />

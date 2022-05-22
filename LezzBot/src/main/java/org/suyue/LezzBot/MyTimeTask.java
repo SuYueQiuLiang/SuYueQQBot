@@ -23,6 +23,6 @@ public class MyTimeTask extends TimerTask {
     }
     @Override
     public void run() {
-        Running.run(httpUtil,bot,userQQ,userId,userPassword,validMileage);
+        Running.run(httpUtil,bot,userQQ,userId,userPassword,validMileage,0);
     }
 }

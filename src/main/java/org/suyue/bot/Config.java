@@ -80,6 +80,9 @@ public class Config {
                     entry.getValue().receiveFriendMessage(event);
                 }
         });
+        bot.getEventChannel().subscribeAlways(FriendAddEvent.class,(event)->{
+            event.getFriend().sendMessage(getHelpStr());
+        });
     }
     private static boolean isMessageOnlyPlainText(MessageChain messageChain){
         for(int i =1;i< messageChain.size();i++)

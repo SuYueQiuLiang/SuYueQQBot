@@ -9,17 +9,54 @@ import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.MessageChain;
 import org.suyue.bot.SuYueBotMod;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 
 public class Main implements SuYueBotMod {
-    private static final long PERIOD_DAY = 30 * 60 * 1000;
+    private static final long PERIOD_HALF_HOUR = 30 * 60 * 1000;
+    private static final long PERIOD_DAY = 24 * 60 * 60 * 1000;
     public MyTimeTask task;
-    public Timer timer;
-    public Main(){
+    public MyBufferTimeTask bufferTimeTask;
+    public MyYesterdayTimeTask yesterdayTimeTask;
+    public Timer timer, bufferTimer, changeTimer;
+
+    public Main() {
         timer = new Timer();
+        bufferTimer = new Timer();
+        changeTimer = new Timer();
         task = new MyTimeTask();
-        timer.schedule(task, 0, PERIOD_DAY);
+        bufferTimeTask = new MyBufferTimeTask();
+        yesterdayTimeTask = new MyYesterdayTimeTask();
+        timer.schedule(task, 0, PERIOD_HALF_HOUR);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date date1 = calendar.getTime();
+        if (date1.before(new Date())) {
+            date1 = this.addDay(date1, 1);
+        }
+        changeTimer.schedule(yesterdayTimeTask, date1, PERIOD_DAY);
+        calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date date2 = calendar.getTime();
+        if (date2.before(new Date())) {
+            date2 = this.addDay(date2, 1);
+        }
+        bufferTimer.schedule(bufferTimeTask, date2, PERIOD_DAY);
     }
+
+    // 增加或减少天数
+    public Date addDay(Date date, int num) {
+        Calendar startDT = Calendar.getInstance();
+        startDT.setTime(date);
+        startDT.add(Calendar.DAY_OF_MONTH, num);
+        return startDT.getTime();
+    }
+
     @Override
     public void receiveFriendMessage(FriendMessageEvent event) {
         MessageChain messageChain = event.getMessage();
@@ -44,25 +81,44 @@ public class Main implements SuYueBotMod {
     public void receiveMessage(MessageEvent event) {
 
     }
-    private String getStringWithCity(String cityName){
+
+    @Override
+    public void unloadMod() {
+        timer.cancel();
+    }
+
+    private String getStringWithCity(String cityName) {
         StringBuilder builder = new StringBuilder();
-        JSONObject jsonObject = Data.data.getJSONObject("data");
-        builder.append(jsonObject.getString("times")).append("\n");
-        JSONArray array = jsonObject.getJSONArray("list");
-        for(int i = 0;i<array.size();i++){
-            if(array.getJSONObject(i).getString("name").replace("市","").replace("省","").equals(cityName)){
-                builder.append(cityName).append("现有确诊：").append(array.getJSONObject(i).getString("econNum")).append("\n现有无症状：").append(array.getJSONObject(i).getString("asymptomNum")).append("\n今日新增：").append(array.getJSONObject(i).getString("conadd"));
-                return builder.toString();
-            }else {
+        builder.append(getLastDataTime()).append("\n");
+        int now = getNumberWithFullName(Data.data, cityName);
+        if(now == -1)
+            return "未查询到 " + cityName + "的疫情详情";
+        builder.append("现有确诊：").append(now).append("\n");
+        if (Data.yesterdayData == null)
+            builder.append("暂无昨日数据！");
+        else
+            builder.append("相较昨日，确诊人数：").append(now-getNumberWithFullName(Data.yesterdayData,cityName));
+        return builder.toString();
+    }
+
+    private String getLastDataTime() {
+        return Data.data.getJSONObject("data").getString("times");
+    }
+
+    private int getNumberWithFullName(JSONObject data, String name) {
+        JSONArray array = data.getJSONObject("data").getJSONArray("list");
+        for (int i = 0; i < array.size(); i++) {
+            if (array.getJSONObject(i).getString("name").replace("市", "").replace("省", "").equals(name)) {
+                return Integer.parseInt(array.getJSONObject(i).getString("econNum"));
+            } else {
                 JSONArray city = array.getJSONObject(i).getJSONArray("city");
-                for(int ii = 0;ii<city.size();ii++){
-                    if(city.getJSONObject(ii).getString("name").replace("市","").replace("省","").equals(cityName)||city.getJSONObject(ii).getString("mapName").equals(cityName)){
-                        builder.append(cityName).append("现有确诊：").append(city.getJSONObject(ii).getString("econNum")).append("\n现有无症状：").append(city.getJSONObject(ii).getString("asymptomNum")).append("\n今日新增：").append(city.getJSONObject(ii).getString("conadd"));
-                        return builder.toString();
+                for (int ii = 0; ii < city.size(); ii++) {
+                    if (city.getJSONObject(ii).getString("name").replace("市", "").replace("省", "").equals(name) || city.getJSONObject(ii).getString("mapName").equals(name)) {
+                        return Integer.parseInt(city.getJSONObject(ii).getString("econNum"));
                     }
                 }
             }
         }
-        return "未查询到 " + cityName + "的疫情详情";
+        return -1;
     }
 }

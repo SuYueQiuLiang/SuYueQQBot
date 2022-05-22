@@ -26,6 +26,7 @@
         <module>MainBotAdmin</module>
         <module>HttpBot</module>
         <module>FeiYan</module>
+        <module>MyMoudle</module>
     </modules>
 
     <properties>

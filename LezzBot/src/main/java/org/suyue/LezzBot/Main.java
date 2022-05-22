@@ -11,8 +11,6 @@ import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.PlainText;
 import org.suyue.bot.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +21,14 @@ public class Main implements SuYueBotMod {
     public static String baiduMapAk;
     private final Map<Long,LezzTask> users = new HashMap<>();
     private final ModConfig modConfig;
+
+    @Override
+    public void unloadMod() {
+        for(Map.Entry<Long,LezzTask> entry:users.entrySet()){
+            entry.getValue().timer.cancel();
+        }
+    }
+
     public Main(){
         modConfig = new ModConfig(modName);
         JSONObject jsonObject = JSON.parseObject(modConfig.readConfig());
@@ -106,7 +112,7 @@ public class Main implements SuYueBotMod {
                     if(users.get(event.getSender().getId())!=null){
                         try{
                             event.getSender().sendMessage("已发送请求，请稍后在私聊中查看推送");
-                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
+                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]),0);
                         }catch (NumberFormatException e){
                             e.printStackTrace();
                             event.getSender().sendMessage("参数格式错误，请输入数字");
@@ -140,7 +146,7 @@ public class Main implements SuYueBotMod {
                     if(users.get(event.getSender().getId())!=null){
                         try{
                             event.getGroup().sendMessage(new At(event.getSender().getId()).plus("已发送请求，请稍后在私聊中查看推送，如果未推送并且需要推送，请添加机器人为好友"));
-                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]));
+                            Running.run(new HttpUtil(),Config.defaultBot,event.getSender().getId(),users.get(event.getSender().getId()).userId,users.get(event.getSender().getId()).userPassword,Double.parseDouble(split[1]),0);
                         }catch (NumberFormatException e){
                             e.printStackTrace();
                             event.getGroup().sendMessage(new At(event.getSender().getId()).plus("参数格式错误，请输入整数"));
@@ -156,6 +162,7 @@ public class Main implements SuYueBotMod {
     public void receiveMessage(MessageEvent event) {
 
     }
+
 
     private static boolean isMessageOnlyPlainText(MessageChain messageChain){
         for(int i =1;i< messageChain.size();i++)

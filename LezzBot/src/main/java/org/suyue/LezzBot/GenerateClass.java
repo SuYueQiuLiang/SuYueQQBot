@@ -12,14 +12,16 @@ import java.util.Random;
 
 public class GenerateClass {
     private static final double CALORIE_PER_MILEAGE = 58.3;
-    public static String getRunningDetail(String semesterId,String limitationsGoalsSexInfoId,double validMileage,String appVersion,String runningInfo,String signPoint){
+    public static String getRunningDetail(String semesterId,String limitationsGoalsSexInfoId,double validMileage,String appVersion,String runningInfo,String signPoint,long lackTime){
         Random random = new Random(System.currentTimeMillis());
         //随机偏移一定的跑步路程避免整数
         double partValid = random.nextDouble();
-        double totMileage = validMileage - (partValid * random.nextDouble());
         validMileage -= partValid;
         DecimalFormat df = new DecimalFormat("#.00");
         validMileage = Double.parseDouble(df.format(validMileage));
+        if(validMileage > 3 && validMileage <= 5)
+            validMileage = 3;
+        double totMileage = validMileage;
         JSONObject content = new JSONObject();
         content.put("scoringType", 1);
         content.put("semesterId", semesterId);
@@ -29,7 +31,8 @@ public class GenerateClass {
         content.put("gpsMileage",totMileage);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int randomTime = random.nextInt(120);
-        long time = System.currentTimeMillis()-(randomTime*60*1000),time2 = time-((random.nextInt(1000)/100+15)*60*1000);
+        System.out.println(lackTime);
+        long time = System.currentTimeMillis()-(randomTime*60*1000)-lackTime,time2 = time-((random.nextInt(1000)/100+15)*60*1000);
         Date date1 = new Date(time2);
         Date date2 = new Date(time);
         content.put("startTime",simpleDateFormat.format(date1));

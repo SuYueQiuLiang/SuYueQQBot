@@ -21,6 +21,14 @@ public class Main implements SuYueBotMod {
     private JSONArray config;
     private final Map<String,HttpTask> tasks = new HashMap<>();
     private final ModConfig modConfig;
+
+    @Override
+    public void unloadMod() {
+        for(Map.Entry<String,HttpTask> entry:tasks.entrySet()){
+            entry.getValue().timer.cancel();
+        }
+    }
+
     public Main(){
         modConfig = new ModConfig(modName);
         config = JSON.parseArray(modConfig.readConfig());

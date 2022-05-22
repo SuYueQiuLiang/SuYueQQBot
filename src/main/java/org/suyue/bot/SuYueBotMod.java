@@ -10,4 +10,5 @@ public interface SuYueBotMod {
     void receiveFriendMessage(FriendMessageEvent event);
     void receiveGroupMessage(GroupMessageEvent event);
     void receiveMessage(MessageEvent event);
+    default void unloadMod(){};
 }
